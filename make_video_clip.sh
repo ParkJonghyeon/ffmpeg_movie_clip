@@ -31,4 +31,4 @@ else
     rm ffmpeg-release-64bit-static.tar.xz
 fi
 
-python3 make_video_clip.py ffmpeg-*/ffmpeg INPUT.mp4 test.json
+python3 make_video_clip.py ffmpeg-*/ffmpeg [] []
