@@ -1,4 +1,7 @@
 #!/bin/sh
+CONTENTS_ID_MP4="$1"
+CONTENTS_JSONFILE="$2"
+
 APT_UPDATE=0
 if dpkg --get-selections | grep -q "wget" > /dev/null; then
         echo "" > /dev/null
@@ -31,4 +34,4 @@ else
     rm ffmpeg-release-64bit-static.tar.xz
 fi
 
-python3 make_video_clip.py ffmpeg-*/ffmpeg [] []
+python3 make_video_clip.py ffmpeg-*/ffmpeg $CONTENTS_ID_MP4 $CONTENTS_JSONFILE
