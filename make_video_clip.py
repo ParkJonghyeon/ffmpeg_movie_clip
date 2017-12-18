@@ -1,6 +1,7 @@
 import subprocess
 import json
 import sys
+import datetime
 
 PATH = {"FFMPEG" : '',
 	"INPUT_FILE" : '',
@@ -28,6 +29,15 @@ def path_init(ffmpeg_path, input_video, json_file):
     PATH["JSON_FILE"] = json_file
 
 
+def calculate_gif_time(start_time):
+    time_format = '%H:%M:%S'
+    time_length = datetime.datetime.strptime(start_time,time_format) + datetime.timedelta(seconds=10)
+    secs = time_length.second
+    mins = time_length.minute
+    hours = time_length.hour
+    return str(hours)+':'+str(mins)+':'+str(secs)
+
+
 def cut_video(clip_index, start_time, end_time):
     command = PATH["FFMPEG"] + ' -i '+PATH["INPUT_FILE"]+' -c copy -ss ' + start_time + ' -to '+end_time+' '+PATH["OUTPUT_CLIP_FILE"]+clip_index+PATH["OUTPUT_CLIP_FORMAT"]
     subprocess.call (command, shell=True)
@@ -53,24 +63,12 @@ def main():
         for clip_index in range(len(clips)):
             end_time = clips[clip_index]['end_time']
             start_time = clips[clip_index]['start_time']
+            gif_end_time = calculate_gif_time(start_time)
+
             cut_video(str(clip_index), start_time, end_time)
-
-    if 'thumbnails' in json_log_data:
-        thumbnails = json_log_data['thumbnails']
-
-        for thumbnail_index in range(len(thumbnails)):
-            thumbnail_time = thumbnails[thumbnail_index]['thumbnail_time']
-            cut_thumbnail(str(thumbnail_index), thumbnail_time)    
-
-    if 'gifs' in json_log_data:
-        gifs = json_log_data['gifs']
-
-        for gif_index in range(len(gifs)):
-            end_time = gifs[gif_index]['end_time']
-            start_time = gifs[gif_index]['start_time']
-            cut_gif(str(gif_index), start_time, end_time)
+            cut_thumbnail(str(clip_index), start_time)
+            cut_gif(str(clip_index), start_time, gif_end_time)
         
-
 
 if __name__ == '__main__':
     input_val_len = len(sys.argv)
