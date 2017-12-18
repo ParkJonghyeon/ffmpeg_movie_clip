@@ -4,7 +4,7 @@ CONTENTS_JSONFILE="$2"
 
 APT_UPDATE=0
 if dpkg --get-selections | grep -q "wget" > /dev/null; then
-        echo "" > /dev/null
+        echo "wget is checked..."
 else
         if [ $APT_UPDATE -eq 0 ]; then
                 echo "apt update..."
@@ -21,9 +21,9 @@ NEW_FFMPEG_VER=`cat tmp.html | grep -Eo 'release: [0-9.]*[0-9]' | grep -Eo '[0-9
 rm tmp.html
 
 if ls | grep ffmpeg > /dev/null; then
-    echo "" > /dev/null
+    echo "ffmpeg is checked..."
 else
-    echo "download ffmpeg"
+    echo "download ffmpeg..."
     wget -q -O tmp.html https://www.johnvansickle.com/ffmpeg/
     RELEASE_URL=`cat tmp.html | grep -Eo '(http|https)[^<>]*?tar.xz' | grep -m 1 release-64bit`
     NEW_FFMPEG_VER=`cat tmp.html | grep -Eo 'release: [0-9.]*[0-9]' | grep -Eo '[0-9.]*[0-9]'`
