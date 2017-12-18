@@ -23,11 +23,13 @@ def path_init(ffmpeg_path, input_video, json_file):
     else:
         PATH["FFMPEG"] = ffmpeg_path
     PATH["INPUT_FILE"] = input_video
-    PATH["OUTPUT_CLIP_FILE"] = PATH["INPUT_FILE"].split('.')[0] + '_clip_'
-    PATH["OUTPUT_CLIP_FORMAT"] = '.' + PATH["INPUT_FILE"].split('.')[1]
-    PATH["OUTPUT_THUMB_FILE"] = PATH["INPUT_FILE"].split('.')[0] + '_thumbnail_'
+    input_token = PATH["INPUT_FILE"].split('/')
+    input_file_name = input_token[len(input_token)-1]
+    PATH["OUTPUT_CLIP_FILE"] = './clips/' + input_file_name.split('.')[0] + '_clip_'
+    PATH["OUTPUT_CLIP_FORMAT"] = '.' + input_file_name.split('.')[1]
+    PATH["OUTPUT_THUMB_FILE"] = './clips/' + input_file_name.split('.')[0] + '_thumbnail_'
     PATH["OUTPUT_THUMB_FORMAT"] = '.jpg'
-    PATH["OUTPUT_GIF_FILE"] = PATH["INPUT_FILE"].split('.')[0] + '_gif_'
+    PATH["OUTPUT_GIF_FILE"] = './clips/' + input_file_name.split('.')[0] + '_gif_'
     PATH["OUTPUT_GIF_FORMAT"] = '.gif'
     PATH["JSON_FILE"] = json_file
 

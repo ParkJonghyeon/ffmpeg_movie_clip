@@ -15,11 +15,6 @@ else
         apt-get -qq install wget
 fi
 
-wget -q -O tmp.html https://www.johnvansickle.com/ffmpeg/
-RELEASE_URL=`cat tmp.html | grep -Eo '(http|https)[^<>]*?tar.xz' | grep -m 1 release-64bit`
-NEW_FFMPEG_VER=`cat tmp.html | grep -Eo 'release: [0-9.]*[0-9]' | grep -Eo '[0-9.]*[0-9]'`
-rm tmp.html
-
 if ls | grep ffmpeg > /dev/null; then
     echo "ffmpeg is checked..."
 else
@@ -32,6 +27,13 @@ else
     wget -qq $RELEASE_URL
     tar -xf ffmpeg-release-64bit-static.tar.xz
     rm ffmpeg-release-64bit-static.tar.xz
+fi
+
+if ls | grep clips > /dev/null; then
+    echo "clips dir is checked..."
+else
+    echo "make clips dir..."
+    mkdir clips
 fi
 
 python3 make_video_clip.py ffmpeg-*/ffmpeg $CONTENTS_ID_MP4 $CONTENTS_JSONFILE
