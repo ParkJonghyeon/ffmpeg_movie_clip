@@ -9,6 +9,8 @@ PATH = {"FFMPEG": '',
         "INPUT_FILE": '',
         "OUTPUT_CLIP_FILE": '',
         "OUTPUT_CLIP_FORMAT": '',
+        "OUTPUT_HIGHLIGHT_FILE": '',
+        "OUTPUT_HIGHLIGHT_FORMAT": '',
         "OUTPUT_THUMB_FILE": '',
         "OUTPUT_THUMB_FORMAT": '',
         "OUTPUT_GIF_FILE": '',
@@ -27,6 +29,8 @@ def path_init(ffmpeg_path, input_video, json_file):
     input_file_name = input_token[len(input_token)-1]
     PATH["OUTPUT_CLIP_FILE"] = './clips/' + input_file_name.split('.')[0] + '_clip_'
     PATH["OUTPUT_CLIP_FORMAT"] = '.' + input_file_name.split('.')[1]
+    PATH["OUTPUT_HIGHLIGHT_FILE"] = './clips/' + input_file_name.split('.')[0] + '_highlight'
+    PATH["OUTPUT_HIGHLIGHT_FORMAT"] = '.' + input_file_name.split('.')[1]
     PATH["OUTPUT_THUMB_FILE"] = './clips/' + input_file_name.split('.')[0] + '_thumbnail_'
     PATH["OUTPUT_THUMB_FORMAT"] = '.jpg'
     PATH["OUTPUT_GIF_FILE"] = './clips/' + input_file_name.split('.')[0] + '_gif_'
@@ -48,6 +52,19 @@ def calculate_gif_time(start_time):
 def cut_video(clip_index, start_time, end_time):
     command = PATH["FFMPEG"] + ' -y -i '+PATH["INPUT_FILE"]+' -c copy -ss ' + start_time + ' -to '+end_time+' '+PATH["OUTPUT_CLIP_FILE"]+clip_index+PATH["OUTPUT_CLIP_FORMAT"]
     subprocess.call(command, shell=True)
+
+
+# Translate .mp4 to .ts file for merge.
+def trans_intermediate_clip(clip_index):
+    command = PATH["FFMPEG"] + " -y -i " + PATH["OUTPUT_CLIP_FILE"]+str(clip_index)+PATH["OUTPUT_CLIP_FORMAT"]+" -c copy -bsf:v h264_mp4toannexb -f mpegts ./clips/intermediate"+str(clip_index)+".ts"
+    subprocess.call(command, shell=True)
+
+
+# Merging .ts video clips as one highlight. Then remove .ts files
+def merge_video(command):
+    rm_ts_file_command = "rm clips/intermediate*"
+    subprocess.call(command, shell=True)    
+    subprocess.call(rm_ts_file_command, shell=True)
 
 
 # Cut thumbnail from start time
@@ -78,6 +95,14 @@ def main():
             cut_video(str(clip_index), start_time, end_time)
             cut_thumbnail(str(clip_index), start_time)
             cut_gif(str(clip_index), start_time, gif_end_time)
+
+        merge_list = ""
+        for clip_index in range(len(clips)):
+            trans_intermediate_clip(clip_index)
+            merge_list = merge_list+"./clips/intermediate"+str(clip_index)+".ts|"
+        merge_command = PATH["FFMPEG"] + " -y -i \"concat:" + merge_list + "\" -c copy -bsf:a aac_adtstoasc "+PATH["OUTPUT_HIGHLIGHT_FILE"]+PATH["OUTPUT_HIGHLIGHT_FORMAT"]
+        merge_video(merge_command)
+        
 
 
 # Calling init func to using apt ffmpeg or static ffmpeg
